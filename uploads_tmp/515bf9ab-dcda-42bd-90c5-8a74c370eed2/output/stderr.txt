@@ -1,0 +1,4 @@
+Unable to find image 'bioreactor-python-runner:latest' locally
+docker: Error response from daemon: Get "https://registry-1.docker.io/v2/": EOF
+
+Run 'docker run --help' for more information
