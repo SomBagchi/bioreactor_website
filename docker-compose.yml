@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  # Web Server - User interface
+  web-server:
+    build: ./web-server
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - BIOREACTOR_HUB_HOST=bioreactor-hub
+      - BIOREACTOR_HUB_PORT=8000
+    volumes:
+      - ./web-server:/app
+    depends_on:
+      - bioreactor-hub
+    networks:
+      - bioreactor-network
+
+  # Bioreactor Hub - Middleware service
+  bioreactor-hub:
+    build: ./bioreactor-hub
+    ports:
+      - "8000:8000"
+    environment:
+      - BIOREACTOR_NODE_HOST=bioreactor-node
+      - BIOREACTOR_NODE_PORT=9000
+    volumes:
+      - ./bioreactor-hub:/app
+      - experiment-data:/app/data
+    depends_on:
+      - bioreactor-node
+    networks:
+      - bioreactor-network
+
+  # Bioreactor Node - Hardware interface
+  bioreactor-node:
+    build: ./bioreactor-node
+    ports:
+      - "9000:9000"
+    environment:
+      - HARDWARE_MODE=simulation  # Set to 'real' for actual hardware
+    volumes:
+      - ./bioreactor-node:/app
+    networks:
+      - bioreactor-network
+
+volumes:
+  experiment-data:
+
+networks:
+  bioreactor-network:
+    driver: bridge 

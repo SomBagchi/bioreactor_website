@@ -5,6 +5,7 @@ import uuid
 import paramiko
 import shutil
 import time
+import traceback
 
 # Load configuration from config.env
 load_dotenv('config.env')
@@ -156,23 +157,32 @@ def upload_file():
 
 @app.route('/output/<uuid>')
 def output(uuid):
-    # Show output files and provide download as zip
     try:
+        print(f"[DEBUG] Attempting SSH connection to bioreactor.")
+        print(f"[DEBUG] BIOREACTOR_IP: {BIOREACTOR_IP}")
+        print(f"[DEBUG] BIOREACTOR_USER: {BIOREACTOR_USER}")
+        print(f"[DEBUG] SSH_KEY_PATH: {SSH_KEY_PATH}")
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        print(f"[DEBUG] Connecting via SSH...")
         ssh.connect(BIOREACTOR_IP, username=BIOREACTOR_USER, key_filename=SSH_KEY_PATH)
+        print(f"[DEBUG] SSH connection established.")
         sftp = ssh.open_sftp()
         remote_output_dir = f"{BIOREACTOR_WORLD_DIR}/{uuid}/output"
+        print(f"[DEBUG] Listing files in remote output dir: {remote_output_dir}")
         output_files = sftp.listdir(remote_output_dir)
+        print(f"[DEBUG] Output files found: {output_files}")
         # Download all output files to a temp dir
         local_tmp = os.path.join(UPLOAD_FOLDER, uuid, 'output')
         os.makedirs(local_tmp, exist_ok=True)
         for fname in output_files:
+            print(f"[DEBUG] Downloading {fname} from remote to local {local_tmp}")
             sftp.get(f"{remote_output_dir}/{fname}", os.path.join(local_tmp, fname))
         sftp.close()
         ssh.close()
         # Zip the output files
         zip_path = os.path.join(UPLOAD_FOLDER, uuid, 'output.zip')
+        print(f"[DEBUG] Creating zip archive at {zip_path}")
         shutil.make_archive(zip_path[:-4], 'zip', local_tmp)
         # Show output file names and download link
         return render_template_string('''
@@ -186,6 +196,8 @@ def output(uuid):
             <br><a href="/">Back to upload</a>
         ''', uuid=uuid, output_files=output_files)
     except Exception as e:
+        tb = traceback.format_exc()
+        print(f"[ERROR] Exception in /output/{{uuid}}: {e}\n{tb}")
         flash(f'Error retrieving output: {e}')
         return redirect(url_for('index'))
 
@@ -197,4 +209,12 @@ def download_output(uuid):
 # TODO: Add upload route and logic
 
 if __name__ == '__main__':
+    required_vars = {
+        'BIOREACTOR_IP': BIOREACTOR_IP,
+        'BIOREACTOR_USER': BIOREACTOR_USER,
+        'SSH_KEY_PATH': SSH_KEY_PATH,
+    }
+    for var, value in required_vars.items():
+        if not value:
+            print(f"[ERROR] Required environment variable {var} is not set!")
     app.run(debug=True) 
