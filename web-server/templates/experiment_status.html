@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Experiment Status - Bioreactor Web Server</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Experiment Status</h1>
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+    {% if experiment %}
+        <div>
+            <b>Experiment ID:</b> {{ experiment_id }}<br>
+            <b>Status:</b> {{ experiment.status }}<br>
+            <b>Start Time:</b> {{ experiment.start_time or 'N/A' }}<br>
+            <b>End Time:</b> {{ experiment.end_time or 'N/A' }}<br>
+            <b>Exit Code:</b> {{ experiment.exit_code or 'N/A' }}<br>
+            <b>Duration:</b> {{ experiment.duration or 'N/A' }} seconds<br>
+        </div>
+        {% if experiment.status == 'completed' %}
+            <div style="margin-top:1em;">
+                <a href="/experiment/{{ experiment_id }}/download">Download Results (ZIP)</a>
+            </div>
+        {% endif %}
+    {% endif %}
+    <p><a href="/">Back to Home</a></p>
+</body>
+</html> 

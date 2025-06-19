@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Script - Bioreactor Web Server</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Upload Experiment Script</h1>
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+    {% if success %}
+        <div class="success">{{ success }}</div>
+    {% endif %}
+    {% if experiment_id %}
+        <div class="success">
+            Experiment submitted!<br>
+            Experiment ID: <b>{{ experiment_id }}</b><br>
+            <a href="/experiment/{{ experiment_id }}">View Experiment Status</a>
+        </div>
+    {% endif %}
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".py" required>
+        <button type="submit">Upload</button>
+    </form>
+    <p><a href="/">Back to Home</a></p>
+</body>
+</html> 

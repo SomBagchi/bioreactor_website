@@ -1,0 +1,32 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 2em;
+    background: #f8f8f8;
+}
+h1 {
+    color: #2c3e50;
+}
+form {
+    margin-top: 1em;
+}
+.error {
+    color: #fff;
+    background: #e74c3c;
+    padding: 0.5em 1em;
+    margin-bottom: 1em;
+    border-radius: 4px;
+}
+.success {
+    color: #fff;
+    background: #27ae60;
+    padding: 0.5em 1em;
+    margin-bottom: 1em;
+    border-radius: 4px;
+}
+a {
+    color: #2980b9;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+} 
