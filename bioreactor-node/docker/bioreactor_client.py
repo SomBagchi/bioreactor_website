@@ -14,11 +14,11 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class BioreactorClient:
-    """Client for communicating with bioreactor hardware through hub API"""
+    """Client for communicating with bioreactor hardware through node API"""
     
     def __init__(self, api_url: Optional[str] = None):
         """Initialize bioreactor client"""
-        self.api_url = api_url or os.getenv("BIOREACTOR_HUB_API_URL", "http://host.docker.internal:8000")
+        self.api_url = api_url or os.getenv("BIOREACTOR_NODE_API_URL", "http://localhost:9000")
         self.session = requests.Session()
         self.session.timeout = 30
         

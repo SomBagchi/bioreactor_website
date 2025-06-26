@@ -5,45 +5,41 @@ services:
   web-server:
     build: ./web-server
     ports:
-      - "5000:5000"
+      - "8080:8080"
     environment:
-      - FLASK_ENV=development
-      - BIOREACTOR_HUB_HOST=bioreactor-hub
-      - BIOREACTOR_HUB_PORT=8000
-    volumes:
-      - ./web-server:/app
+      - BIOREACTOR_HUB_API_URL=http://bioreactor-hub:8000
     depends_on:
       - bioreactor-hub
-    networks:
-      - bioreactor-network
+    volumes:
+      - ./web-server/uploads_tmp:/app/uploads_tmp
 
-  # Bioreactor Hub - Middleware service
+  # Bioreactor Hub - Experiment forwarding service
   bioreactor-hub:
     build: ./bioreactor-hub
     ports:
       - "8000:8000"
     environment:
       - BIOREACTOR_NODE_HOST=bioreactor-node
-      - BIOREACTOR_NODE_PORT=9000
-    volumes:
-      - ./bioreactor-hub:/app
-      - experiment-data:/app/data
+      - BIOREACTOR_NODE_PORT=22
+      - BIOREACTOR_NODE_USERNAME=pi
+      - SSH_KEY_PATH=/app/ssh_keys/id_rsa
     depends_on:
       - bioreactor-node
-    networks:
-      - bioreactor-network
+    volumes:
+      - ./bioreactor-hub/ssh_keys:/app/ssh_keys:ro
 
-  # Bioreactor Node - Hardware interface
+  # Bioreactor Node - Hardware interface and container management
   bioreactor-node:
     build: ./bioreactor-node
     ports:
       - "9000:9000"
     environment:
-      - HARDWARE_MODE=simulation  # Set to 'real' for actual hardware
+      - HARDWARE_MODE=simulation
+      - LOG_LEVEL=INFO
     volumes:
-      - ./bioreactor-node:/app
-    networks:
-      - bioreactor-network
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./bioreactor-node/data:/app/data
+    privileged: true  # Required for Docker-in-Docker
 
 volumes:
   experiment-data:

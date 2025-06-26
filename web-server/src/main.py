@@ -11,7 +11,7 @@ import io
 app = FastAPI(title="Bioreactor Web Server", description="User interface for bioreactor experiments.")
 
 # Static and template directories
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 TEMPLATES_DIR = BASE_DIR / "templates"
 STATIC_DIR = BASE_DIR / "static"
 UPLOADS_DIR = BASE_DIR / "uploads_tmp"
